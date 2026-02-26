@@ -1,11 +1,3 @@
-// ============================================================================
-// STOCK PRICE VISUALIZATION ASSIGNMENT (WITH BONUS: IBM + MSFT)
-// ============================================================================
-
-// ============================================================================
-// DATA LOADING
-// ============================================================================
-// Load CSV files for stocks in parallel
 let stocks = await Promise.all([
   d3.csv("data/AAPL.csv").then(data => ({ name: "AAPL", values: data })),
   d3.csv("data/GOOG.csv").then(data => ({ name: "GOOG", values: data })),
@@ -16,10 +8,6 @@ let stocks = await Promise.all([
 
 console.log("Loaded stocks:", stocks);
 
-// ============================================================================
-// DATA PROCESSING
-// ============================================================================
-// Convert strings to Date/Number and sort by date
 stocks.forEach(stock => {
   stock.values.forEach(d => {
     d.Date = new Date(d.Date);
@@ -36,16 +24,10 @@ stocks.forEach(stock => {
 
 console.log("Processed first stock:", stocks[0].values[0]);
 
-// ============================================================================
-// CHART DIMENSIONS
-// ============================================================================
 const margin = { top: 50, right: 160, bottom: 50, left: 100 };
 const width = 1000 - margin.left - margin.right;
 const height = 800 - margin.top - margin.bottom;
 
-// ============================================================================
-// SVG SETUP
-// ============================================================================
 const svg = d3.select("#chart")
   .append("svg")
   .attr("width", width + margin.left + margin.right)
@@ -53,17 +35,12 @@ const svg = d3.select("#chart")
   .append("g")
   .attr("transform", `translate(${margin.left},${margin.top})`);
 
-// ============================================================================
-// CREATE SCALES
-// ============================================================================
 const allValues = stocks.flatMap(s => s.values);
 
-// X Scale - Dates
 const x = d3.scaleUtc()
   .domain(d3.extent(allValues, d => d.Date))
   .range([0, width]);
 
-// Y Scale - Close prices
 const y = d3.scaleLinear()
   .domain([
     d3.min(allValues, d => d.Close),
@@ -71,15 +48,9 @@ const y = d3.scaleLinear()
   ])
   .range([height, 0]);
 
-// Color Scale - Stock names
 const color = d3.scaleOrdinal(d3.schemeCategory10)
   .domain(stocks.map(s => s.name));
 
-// ============================================================================
-// ADD AXES
-// ============================================================================
-
-// X Axis - years
 const xAxis = d3.axisBottom(x)
   .ticks(d3.utcYear.every(1))
   .tickFormat(d3.utcFormat("%Y"));
@@ -102,9 +73,6 @@ svg.append("g")
   .selectAll("text")
   .style("font-size", "12px");
 
-// ============================================================================
-// DRAW LINES
-// ============================================================================
 const line = d3.line()
   .x(d => x(d.Date))
   .y(d => y(d.Close))
@@ -119,11 +87,6 @@ stocks.forEach(stock => {
     .attr("d", line);
 });
 
-// ============================================================================
-// ADD LABELS
-// ============================================================================
-
-// Chart Title
 svg.append("text")
   .attr("class", "chart-title")
   .attr("x", width / 2)
@@ -133,7 +96,6 @@ svg.append("text")
   .style("font-weight", "bold")
   .text("Stock Closing Prices Over Time");
 
-// X Axis Label
 svg.append("text")
   .attr("class", "x-axis-label")
   .attr("x", width / 2)
@@ -142,7 +104,6 @@ svg.append("text")
   .style("font-size", "14px")
   .text("Year");
 
-// Y Axis Label
 svg.append("text")
   .attr("class", "y-axis-label")
   .attr("transform", "rotate(-90)")
@@ -152,9 +113,6 @@ svg.append("text")
   .style("font-size", "14px")
   .text("Close Price (USD)");
 
-// ============================================================================
-// ADD LEGEND
-// ============================================================================
 const legend = svg.append("g")
   .attr("class", "legend")
   .attr("transform", `translate(${width + 20}, 0)`);
